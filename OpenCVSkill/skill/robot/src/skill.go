@@ -44,6 +44,9 @@ func (d *OpenCVSkill) sight() {
 			return
 		default:  //this case will run if the "<-d.stop" is not ready
 			image := media.SnapshotRGBA()  //take a picture and stores it into image
+			//image: width: 1280 pixels
+			//			 height: 720 pixels
+			//&{715 138 182 182}
 
 			//start encoding the "image" picture just taken and sent it to "remote"
 			buf := new(bytes.Buffer)
@@ -58,7 +61,23 @@ func (d *OpenCVSkill) sight() {
 			//reference: https://github.com/go-opencv/go-opencv/blob/master/opencv/cvaux.go
 			//returns an array that tells you what range the face is in?
 			faces := d.cascade.DetectObjects(cvimg)
-			log.Info.Print("The length of the faces are: "); log.Info.Println(len(faces));
+			//log.Info.Print("The length of the faces are: "); log.Info.Println(len(faces));
+
+			//faces are []*opencv.Rect
+			//faces: tells you how many faces HEXA sees
+			//inside faces[index] is *opencv.Rect
+			//faces[index]: tells you where the face is located using a struct
+				//int x, y, width, height
+
+			//to print out the stuff inside the struct
+			if len(faces) > 0 {
+				for _, value := range faces {
+					log.Info.Printf("inside a face is %v\n",value);
+					log.Info.Printf("Top Left point is: %v    Bottom Right point is: %v\n",value.TL(),value.BR())
+					log.Info.Printf("the mid point is %d+%d/2 = %d && %d+%d/2 = %d\n",value.X(),value.Width(),value.X()+value.Width()/2,value.Y(),value.Height(),value.Y()+value.Height()/2)
+				}
+			}
+
 			hexabody.StandWithHeight(float64(len(faces)) * 50)
 		}
 	}
